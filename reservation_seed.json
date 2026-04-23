@@ -1,0 +1,1714 @@
+{
+  "apartments": [
+    {
+      "name": "2 Nolu Daire",
+      "sourceFile": "2 Nolu Daire 2026.docx",
+      "months": [
+        {
+          "monthLabel": "Nisan 2026",
+          "tableIndex": 1,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "30",
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            [
+              "6 DEMİD NOVİKOV",
+              "7 DEMİD NOVİKOV",
+              "8 DEMİD NOVİKOV",
+              "9 DEMİD NOVİKOV",
+              "10 DEMİD NOVİKOV",
+              "11 DEMİD NOVİKOV",
+              "12 SALAVAT NURLAN"
+            ],
+            [
+              "13 SALAVAT NURLAN",
+              "14 SALAVAT NURLAN",
+              "15 SALAVAT NURLAN",
+              "16 SALAVAT NURLAN",
+              "17 SALAVAT NURLAN",
+              "18 SALAVAT NURLAN",
+              "19"
+            ],
+            [
+              "20 HAUTİEVA RAMİLA",
+              "21 HAUTİEVA RAMİLA",
+              "22 HAUTİEVA RAMİLA",
+              "23 HAUTİEVA RAMİLA",
+              "24 HAUTİEVA RAMİLA",
+              "25 HAUTIEVA RAMİLA",
+              "26"
+            ],
+            [
+              "27 EMXA.(X)",
+              "28 X",
+              "29 X",
+              "30 X",
+              "1 X",
+              "2 X",
+              "3"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Mayis 2026",
+          "tableIndex": 2,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3 FİZİKON"
+            ],
+            [
+              "4 FİZİKON",
+              "5 FİZİKON",
+              "6 FİZİKON",
+              "7 FİZİKON",
+              "8 FİZİKON",
+              "9",
+              "10"
+            ],
+            [
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17"
+            ],
+            [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24"
+            ],
+            [
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31"
+            ],
+            [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Haziran 2026",
+          "tableIndex": 3,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            [
+              "8",
+              "9 A. BAKON.X",
+              "10 X",
+              "11 X",
+              "12 X",
+              "13 X",
+              "14 X"
+            ],
+            [
+              "15 X",
+              "16 X",
+              "17 X",
+              "18 X",
+              "19",
+              "20 VİNOKUROV MİRON",
+              "21 VİNOKUROV MİRON"
+            ],
+            [
+              "22 VİNOKUROV MİRON",
+              "23 VİNOKUROV MİRON",
+              "24 VİNOKUROV MİRON",
+              "25 VİNOKUROV MİRON",
+              "26 VİNOKUROV MİRON",
+              "27 VİNOKUROV MİRON",
+              "28 ALISA KOLOTOVA"
+            ],
+            [
+              "29 ALISA KOLOTOVA",
+              "30 ALISA KOLOTOVA",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Temmuz 2026",
+          "tableIndex": 4,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "29",
+              "30",
+              "1 ALISA KOLOTOVA",
+              "2 ALISA KOLOTOVA",
+              "3 ALISA KOLOTOVA",
+              "4 ALISA KOLOTOVA",
+              "5 ALISA KOLOTOVA"
+            ],
+            [
+              "6 ALISA KOLOTOVA",
+              "7 ALISA KOLOTOVA",
+              "8 ALISA KOLOTOVA",
+              "9 ALISA KOLOTOVA",
+              "10 ALISA KOLOTOVA",
+              "11",
+              "12"
+            ],
+            [
+              "13",
+              "14",
+              "15",
+              "16",
+              "17 yaraslau prokopovıch (gulnr)",
+              "18 yaraslau prokopovıch (gulnr)",
+              "19 yaraslau prokopovıch (gulnr)"
+            ],
+            [
+              "20 yaraslau prokopovıch (gulnr)",
+              "21 yaraslau prokopovıch (gulnr)",
+              "22 yaraslau prokopovıch (gulnr)",
+              "23 yaraslau prokopovıch (gulnr)",
+              "24 yaraslau prokopovıch (gulnr)",
+              "25 yaraslau prokopovıch (gulnr)",
+              "26 yaraslau prokopovıch (gulnr)"
+            ],
+            [
+              "27 yaraslau prokopovıch (gulnr)",
+              "28 yaraslau prokopovıch (gulnr)",
+              "29 yaraslau prokopovıch (gulnr)",
+              "30 yaraslau prokopovıch (gulnr)",
+              "31",
+              "1",
+              "2"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Agustos 2026",
+          "tableIndex": 5,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              "1",
+              "2"
+            ],
+            [
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ],
+            [
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16"
+            ],
+            [
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23"
+            ],
+            [
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30"
+            ],
+            [
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Eylul 2026",
+          "tableIndex": 6,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            [
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            [
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20"
+            ],
+            [
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Ekim 2026",
+          "tableIndex": 7,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            [
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11"
+            ],
+            [
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18"
+            ],
+            [
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25"
+            ],
+            [
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              ""
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Kasim 2026",
+          "tableIndex": 8,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "1"
+            ],
+            [
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            [
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15"
+            ],
+            [
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ],
+            [
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29"
+            ],
+            [
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Aralik 2026",
+          "tableIndex": 9,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            [
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            [
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20"
+            ],
+            [
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "31",
+              "1 Yılbaşı",
+              "2",
+              "3"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5 Nolu Daire",
+      "sourceFile": "5 Nolu Daire 2026 - .docx",
+      "months": [
+        {
+          "monthLabel": "Nisan 2026",
+          "tableIndex": 1,
+          "rows": [
+            [
+              "0Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "30",
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            [
+              "6 Novikov DAMİR",
+              "7 Novikov DAMİR",
+              "8 Novikov DAMİR",
+              "9 Novikov DAMİR",
+              "10 Novikov DAMİR",
+              "11 Novikov DAMİR",
+              "12 Novikov DAMİR"
+            ],
+            [
+              "13 FİZİKON",
+              "14 FİZİKON",
+              "15 FİZİKON",
+              "16 FİZİKON",
+              "17 FİZİKON",
+              "18 FİZİKON",
+              "19 FİZİKON"
+            ],
+            [
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25 Dıar X",
+              "26 X"
+            ],
+            [
+              "27 X",
+              "28 X",
+              "29 X",
+              "30 X",
+              "1",
+              "2",
+              "3"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Mayis 2026",
+          "tableIndex": 2,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "1 X",
+              "2 X",
+              "3"
+            ],
+            [
+              "4 YUSUF YANIKTEPE",
+              "5 YUSUF YANIKTEPE",
+              "6 YUSUF YANIKTEPE",
+              "7 YUSUF YANIKTEPE",
+              "8 YUSUF YANIKTEPE",
+              "9 YUSUF YANIKTEPE",
+              "10"
+            ],
+            [
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17"
+            ],
+            [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24"
+            ],
+            [
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Haziran 2026",
+          "tableIndex": 3,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7 FİZİKON X"
+            ],
+            [
+              "8 FİZİKON",
+              "9 FİZİKON",
+              "10 FİZİKON",
+              "11 FİZİKON",
+              "12 FİZİKON",
+              "13 FİZİKON",
+              "14"
+            ],
+            [
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21"
+            ],
+            [
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28 VERONIKA SHOSTAKEVICH"
+            ],
+            [
+              "29 VERONIKA SHOSTAKEVICH",
+              "30 VERONIKA SHOSTAKEVICH",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Temmuz 2026",
+          "tableIndex": 4,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "29",
+              "30",
+              "1 VERONIKA SHOSTAKEVICH",
+              "2 VERONIKA SHOSTAKEVICH",
+              "3 VERONIKA SHOSTAKEVICH",
+              "4 VERONIKA SHOSTAKEVICH",
+              "5 VERONIKA SHOSTAKEVICH"
+            ],
+            [
+              "6 VERONIKA SHOSTAKEVICH",
+              "7 VERONIKA SHOSTAKEVICH",
+              "8 VERONIKA SHOSTAKEVICH",
+              "9 VERONIKA SHOSTAKEVICH",
+              "10 VERONIKA SHOSTAKEVICH",
+              "11",
+              "12"
+            ],
+            [
+              "13",
+              "14",
+              "15",
+              "16",
+              "17 MARK ANTONIO",
+              "18 MARK ANTONIO",
+              "19 MARK ANTONIO"
+            ],
+            [
+              "20 MARK ANTONIO",
+              "21 MARK ANTONIO",
+              "22 MARK ANTONIO",
+              "23 MARK ANTONIO",
+              "24 MARK ANTONIO",
+              "25 MARK ANTONIO",
+              "26 MARK ANTONIO"
+            ],
+            [
+              "27 MARK ANTONIO",
+              "28 MARK ANTONIO",
+              "29 MARK ANTONIO",
+              "30 MARK ANTONIO",
+              "31",
+              "1",
+              "2"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Agustos 2026",
+          "tableIndex": 5,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              "1",
+              "2"
+            ],
+            [
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ],
+            [
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16"
+            ],
+            [
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23"
+            ],
+            [
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30"
+            ],
+            [
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Eylul 2026",
+          "tableIndex": 6,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            [
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            [
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20"
+            ],
+            [
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Ekim 2026",
+          "tableIndex": 7,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            [
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11"
+            ],
+            [
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18"
+            ],
+            [
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25"
+            ],
+            [
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              ""
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Kasim 2026",
+          "tableIndex": 8,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "1"
+            ],
+            [
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            [
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15"
+            ],
+            [
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ],
+            [
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29"
+            ],
+            [
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Aralik 2026",
+          "tableIndex": 9,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            [
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            [
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20"
+            ],
+            [
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "31",
+              "1 Yılbaşı",
+              "2",
+              "3"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8 Nolu Daire",
+      "sourceFile": "8 Nolu Daire 2026.docx",
+      "months": [
+        {
+          "monthLabel": "Nisan 2026",
+          "tableIndex": 1,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "30",
+              "31",
+              "1 Ramazan kakhıev",
+              "2 Ramazan kakhıev",
+              "3 Ramazan kakhıev",
+              "4 Ramazan kakhıev",
+              "5"
+            ],
+            [
+              "6 MUSAYEV ALİ",
+              "7 MUSAYEV ALİ",
+              "8 MUSAYEV ALİ",
+              "9 MUSAYEV ALİ",
+              "10 MUSAYEV ALİ",
+              "11 MUSAYEV ALİ",
+              "12 MUSAYEV ALİ"
+            ],
+            [
+              "13 VAZİR AKHMAD",
+              "14 VAZİR AKHMAD",
+              "15 VAZİR AKHMAD",
+              "16 VAZİR AKHMAD",
+              "17 VAZİR AKHMAD",
+              "18 VAZİR AKHMAD",
+              "19 VAZİR AKHMAD"
+            ],
+            [
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25 DOLU",
+              "26 X"
+            ],
+            [
+              "27X",
+              "28X",
+              "29X",
+              "30X",
+              "1",
+              "2",
+              "3"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Mayis 2026",
+          "tableIndex": 2,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "1 X",
+              "2 X",
+              "3"
+            ],
+            [
+              "4",
+              "5 ALPARSLAN ÇEKİÇ",
+              "6 ALPARSLAN ÇEKİÇ",
+              "7 ALPARSLAN ÇEKİÇ",
+              "8 ALPARSLAN ÇEKİÇ",
+              "9 ALPARSLAN ÇEKİÇ",
+              "10"
+            ],
+            [
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17"
+            ],
+            [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24"
+            ],
+            [
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31"
+            ],
+            [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Haziran 2026",
+          "tableIndex": 3,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            [
+              "8 Gabbasova dariya",
+              "9 Gabbasova dariya",
+              "10 Gabbasova dariya",
+              "11 Gabbasova dariya",
+              "12 Gabbasova dariya",
+              "13 Gabbasova dariya",
+              "14"
+            ],
+            [
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21"
+            ],
+            [
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28"
+            ],
+            [
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Temmuz 2026",
+          "tableIndex": 4,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            [
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12"
+            ],
+            [
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19"
+            ],
+            [
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              "1",
+              "2"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Agustos 2026",
+          "tableIndex": 5,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              "1",
+              "2"
+            ],
+            [
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ],
+            [
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16"
+            ],
+            [
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23"
+            ],
+            [
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30"
+            ],
+            [
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Eylul 2026",
+          "tableIndex": 6,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "31",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            [
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            [
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20"
+            ],
+            [
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Ekim 2026",
+          "tableIndex": 7,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            [
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11"
+            ],
+            [
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18"
+            ],
+            [
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25"
+            ],
+            [
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "31",
+              ""
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Kasim 2026",
+          "tableIndex": 8,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "1"
+            ],
+            [
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            [
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15"
+            ],
+            [
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ],
+            [
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29"
+            ],
+            [
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          ]
+        },
+        {
+          "monthLabel": "Aralik 2026",
+          "tableIndex": 9,
+          "rows": [
+            [
+              "Pazartesi",
+              "Salı",
+              "Çarşamba",
+              "Perşembe",
+              "Cuma",
+              "Cumartesi",
+              "Pazar"
+            ],
+            [
+              "30",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            [
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            [
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20"
+            ],
+            [
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27"
+            ],
+            [
+              "28",
+              "29",
+              "30",
+              "31",
+              "1 Yılbaşı",
+              "2",
+              "3"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

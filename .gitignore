@@ -1,0 +1,10 @@
+.env
+node_modules/
+dist/
+outputs/
+tools/
+*.log
+Thumbs.db
+.DS_Store
+.netlify/
+data/app-data.json

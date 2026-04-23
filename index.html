@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fizikon Misafirhane Paneli</title>
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="appShell" class="shell logged-out">
+    <aside class="sidebar">
+      <div>
+        <p class="eyebrow">Fizikon Tip Merkezi</p>
+        <h1>Misafirhane Paneli</h1>
+      </div>
+      <div id="loginPanel" class="login-card">
+        <label>Kullanici Adi</label>
+        <input id="username" autocomplete="username" placeholder="admin">
+        <label>Sifre</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="admin">
+        <button id="loginButton">Panele Giris Yap</button>
+        <p id="loginStatus" class="status">Varsayilan admin girisi: admin / admin</p>
+      </div>
+      <div id="sessionPanel" class="login-card hidden">
+        <p class="eyebrow">Oturum</p>
+        <p id="sessionUserLabel" class="session-user"></p>
+        <p id="sessionRoleLabel" class="status"></p>
+        <div class="session-divider"></div>
+        <h3>Sifre Degistir</h3>
+        <label>Mevcut Sifre</label>
+        <input id="currentPasswordChange" type="password" autocomplete="current-password" placeholder="Mevcut sifre">
+        <label>Yeni Sifre</label>
+        <input id="nextPasswordChange" type="password" autocomplete="new-password" placeholder="Yeni sifre">
+        <label>Yeni Sifre Tekrar</label>
+        <input id="confirmPasswordChange" type="password" autocomplete="new-password" placeholder="Yeni sifre tekrar">
+        <button id="changePasswordButton" type="button">Sifreyi Degistir</button>
+        <p id="passwordChangeStatus" class="status hidden"></p>
+        <button id="logoutButton" type="button" class="secondary">Cikis Yap</button>
+      </div>
+      <div id="adminPanel" class="login-card hidden">
+        <p class="eyebrow">Admin</p>
+        <h3>Kullanici Yonetimi</h3>
+        <div id="newUsernameGroup">
+          <label>Yeni Kullanici Adi</label>
+          <input id="newUsername" placeholder="ornek.kullanici">
+        </div>
+        <div id="selectedEditUserGroup" class="hidden">
+          <label>Secilen Kullanici</label>
+          <input id="selectedEditUsername" readonly>
+        </div>
+        <label>Sifre</label>
+        <input id="newPassword" type="password" placeholder="123456">
+        <label>Rol</label>
+        <select id="newUserRole">
+          <option>Personel</option>
+          <option>Admin</option>
+        </select>
+        <div class="inline-actions">
+          <button id="addUserButton" type="button">Kullanici Ekle</button>
+          <button id="editUserButton" type="button" class="secondary">Kullanici Duzenle</button>
+        </div>
+        <div id="editUserPicker" class="hidden">
+          <label>Duzenlenecek Kullanici</label>
+          <select id="editUserSelect"></select>
+          <div class="inline-actions">
+            <button id="loadEditUserButton" type="button" class="secondary">Secileni Yukle</button>
+            <button id="cancelEditUserButton" type="button" class="secondary">Iptal</button>
+          </div>
+        </div>
+        <button id="deleteUserButton" type="button" class="danger-button">Kullanici Sil</button>
+        <div id="deleteUserPicker" class="hidden">
+          <label>Silinecek Kullanici</label>
+          <select id="deleteUserSelect"></select>
+          <div class="inline-actions">
+            <button id="confirmDeleteUserButton" type="button" class="danger-button">Secileni Sil</button>
+            <button id="cancelDeleteUserButton" type="button" class="secondary">Iptal</button>
+          </div>
+        </div>
+        <p id="userAdminStatus" class="status hidden"></p>
+        <div class="admin-divider"></div>
+        <h3>Mail Bildirimi</h3>
+        <p class="status">Gonderen adres: bilgiislem@fizikon.com</p>
+        <label>1. Alici Mail</label>
+        <input id="mailRecipientOne" type="email" placeholder="ornek@firma.com">
+        <label>2. Alici Mail</label>
+        <input id="mailRecipientTwo" type="email" placeholder="ornek2@firma.com">
+        <button id="saveMailButton" type="button">Mail Alicilarini Kaydet</button>
+        <button id="testMailButton" type="button" class="secondary">Deneme Mail Gonder</button>
+        <p id="mailStatus" class="status hidden"></p>
+      </div>
+    </aside>
+
+    <main id="appContent" class="content">
+      <section class="grid main-grid">
+        <article class="card wide">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Rezervasyon Formu</p>
+              <h3 id="formTitle">Yeni kayit olustur</h3>
+              <p id="importStatus" class="status">Word verileri yukleniyor...</p>
+            </div>
+            <button id="exportButton" type="button" class="secondary export-button">Excel'e Aktar</button>
+          </div>
+          <div id="conflictBanner" class="note hidden"></div>
+          <form id="reservationForm" class="form-grid">
+            <label>Daire
+              <select id="apartment">
+                <option>2 Nolu Daire</option>
+                <option>5 Nolu Daire</option>
+                <option>8 Nolu Daire</option>
+              </select>
+            </label>
+            <label>Ad Soyad
+              <input id="guestName" list="guestNameSuggestions" value="Emin">
+              <datalist id="guestNameSuggestions"></datalist>
+            </label>
+            <label>Gelis Tarihi
+              <input id="checkIn" type="date" value="2026-04-22">
+            </label>
+            <label>Cikis Tarihi
+              <input id="checkOut" type="date" value="2026-04-25">
+            </label>
+            <label>Gelis Saati
+              <input id="arrivalTime" type="time" value="14:30">
+            </label>
+            <label>Cikis Saati
+              <input id="checkoutTime" type="time" value="11:00">
+            </label>
+            <div class="form-actions">
+              <button id="submitReservationButton" type="submit">Randevu Ver</button>
+              <button id="editReservationButton" type="button">Duzenle</button>
+              <button id="deleteReservationButton" type="button" class="danger-button">Sil</button>
+              <button id="cancelEditButton" type="button" class="secondary hidden">Secimi Temizle</button>
+            </div>
+            <p id="selectionStatus" class="status">Duzenle ve sil icin takvimde panelden olusturulmus bir randevuya tiklayin.</p>
+          </form>
+        </article>
+
+        <article class="card wide">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Aylik Takvim</p>
+              <h3 id="calendarTitle">Takvim yukleniyor</h3>
+            </div>
+            <div class="filters">
+              <label>Daire
+                <select id="apartmentFilter"></select>
+              </label>
+              <label>Ay
+                <select id="monthFilter"></select>
+              </label>
+            </div>
+          </div>
+          <div class="calendar-wrap">
+            <div id="calendar" class="calendar"></div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

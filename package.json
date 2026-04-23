@@ -1,0 +1,13 @@
+{
+  "name": "fizikon-misafirhane-paneli",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fizikon Misafirhane rezervasyon ve aylik takip paneli",
+  "scripts": {
+    "build": "node build-static.mjs",
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "check": "node --check app.js && node --check server.mjs && node --check build-static.mjs"
+  }
+}
