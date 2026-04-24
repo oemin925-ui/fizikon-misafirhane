@@ -808,7 +808,7 @@ function refreshView() {
 
 function buildExportRows() {
   const visibleReservations = createdReservations.filter((reservation) => canEditReservation(reservation));
-  return [
+  const rows = [
     ["REZERVASYON LISTESI"],
     ["Daire", "Misafir Adi"],
     ...visibleReservations.map((reservation) => [
@@ -816,6 +816,17 @@ function buildExportRows() {
       reservation.guestName,
     ]),
   ];
+
+  if (isAdminSession()) {
+    rows.push(
+      [],
+      ["ISLEM GECMISI"],
+      ["Log Kaydi"],
+      ...logs.map((item) => [item]),
+    );
+  }
+
+  return rows;
 }
 
 function exportCsvFile(fileName, csvContent) {
