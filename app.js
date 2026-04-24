@@ -807,52 +807,15 @@ function refreshView() {
 }
 
 function buildExportRows() {
-  const adminSession = isAdminSession();
-  const importedRows = [];
-
-  state.apartments.forEach((apartment) => {
-    const importedByDate = state.busyByApartment[apartment] || {};
-    Object.keys(importedByDate)
-      .sort()
-      .forEach((isoDate) => {
-        importedByDate[isoDate].forEach((note) => {
-          importedRows.push(["Word Aktarimi", apartment, isoDate, note, "", "", "", "import"]);
-        });
-      });
-  });
-
-  const panelRows = createdReservations.map((reservation) => [
-    "Panel Kaydi",
-    reservation.apartment,
-    reservation.checkIn,
-    canEditReservation(reservation) ? reservation.guestName : "Rezervasyon",
-    canEditReservation(reservation) ? reservation.checkIn : "",
-    canEditReservation(reservation) ? reservation.checkOut : "",
-    canEditReservation(reservation) ? reservation.arrivalTime : "",
-    canEditReservation(reservation) ? reservation.checkoutTime : "",
-  ]);
-
-  const rows = [
-    ["REZERVASYONLAR"],
-    ["Kaynak", "Daire", "Tarih", "Icerik", "Gelis Tarihi", "Cikis Tarihi", "Gelis Saati", "Cikis Saati"],
-    ...importedRows,
-    ...panelRows,
+  const visibleReservations = createdReservations.filter((reservation) => canEditReservation(reservation));
+  return [
+    ["REZERVASYON LISTESI"],
+    ["Daire", "Misafir Adi"],
+    ...visibleReservations.map((reservation) => [
+      reservation.apartment,
+      reservation.guestName,
+    ]),
   ];
-
-  if (adminSession) {
-    const logRows = logs.map((item) => ["Log", item]);
-    const notificationRows = notifications.map((item) => ["Bildirim", item]);
-
-    rows.push(
-      [],
-      ["ISLEM GECMISI"],
-      ["Tip", "Aciklama"],
-      ...logRows,
-      ...notificationRows,
-    );
-  }
-
-  return rows;
 }
 
 function exportCsvFile(fileName, csvContent) {
