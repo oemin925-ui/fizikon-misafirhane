@@ -69,6 +69,24 @@ Admin panelinde:
 
 butonlari hazirdir.
 
+### Render Free icin HTTP Mail API
+
+Render free web servislerde `25`, `465` ve `587` cikis portlari kapali oldugu icin SMTP yerine HTTP mail API kullanmak gerekir.
+
+Bu proje artik `Brevo API` modunu da destekler:
+
+- `MAIL_PROVIDER_MODE=brevo`
+- `MAIL_FROM_ADDRESS=bilgiislem@fizikon.com`
+- `MAIL_FROM_NAME=Fizikon Misafirhane`
+- `BREVO_API_KEY=...`
+
+Brevo kullanilacaksa:
+
+- Brevo hesabinda API key olusturulmasi gerekir
+- `fizikon.com` alan adinin Brevo icinde dogrulanmasi gerekir
+
+Bu sayede Render free uzerinde de mail gonderimi calisir.
+
 ## Kalici Web Yayin
 
 Bu proje Render uzerinde kalici disk ile yayinlanacak sekilde hazirlandi.

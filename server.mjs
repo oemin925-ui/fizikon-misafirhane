@@ -56,6 +56,7 @@ const DEFAULT_MAIL_LEAD_MINUTES = Number(process.env.MAIL_REMINDER_LEAD_MINUTES 
 const MAIL_CHECK_INTERVAL_MS = Number(process.env.MAIL_CHECK_INTERVAL_MS || 60_000);
 const MAIL_FAILURE_BACKOFF_MS = 30 * 60 * 1000;
 const DEFAULT_MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || "bilgiislem@fizikon.com";
+const DEFAULT_MAIL_FROM_NAME = process.env.MAIL_FROM_NAME || "Fizikon Misafirhane";
 const mailProviderMode = typeof process.env.MAIL_PROVIDER_MODE === "string"
   ? process.env.MAIL_PROVIDER_MODE.trim().toLowerCase()
   : "smtp";
@@ -542,19 +543,25 @@ function sanitizeUser(user) {
 
 function getMailConfig() {
   const senderAddress = normalizeEmailAddress(process.env.MAIL_FROM_ADDRESS || DEFAULT_MAIL_FROM_ADDRESS) || DEFAULT_MAIL_FROM_ADDRESS;
+  const senderName = normalizeText(process.env.MAIL_FROM_NAME || DEFAULT_MAIL_FROM_NAME) || "Fizikon Misafirhane";
   const smtpHost = normalizeText(process.env.MAIL_SMTP_HOST || "smtp.yandex.com");
   const smtpPort = Number(process.env.MAIL_SMTP_PORT || 587);
   const smtpUsername = normalizeText(process.env.MAIL_SMTP_USERNAME || senderAddress) || senderAddress;
   const smtpPassword = process.env.MAIL_SMTP_PASSWORD || "";
   const useSsl = normalizeText(process.env.MAIL_SMTP_SECURE || "true").toLowerCase() !== "false";
+  const brevoApiKey = normalizeText(process.env.BREVO_API_KEY || "");
+  const brevoApiBaseUrl = normalizeText(process.env.BREVO_API_BASE_URL || "https://api.brevo.com");
 
   return {
     senderAddress,
+    senderName,
     smtpHost,
     smtpPort,
     smtpUsername,
     smtpPassword,
     useSsl,
+    brevoApiKey,
+    brevoApiBaseUrl,
   };
 }
 
@@ -573,6 +580,19 @@ function getMailProviderStatus() {
 
   if (!config.senderAddress) {
     missing.push("MAIL_FROM_ADDRESS");
+  }
+
+  if (mailProviderMode === "brevo") {
+    if (!config.brevoApiKey) {
+      missing.push("BREVO_API_KEY");
+    }
+
+    return {
+      configured: missing.length === 0,
+      disabled: false,
+      missing,
+      senderAddress: config.senderAddress,
+    };
   }
 
   if (!config.smtpHost) {
@@ -785,11 +805,49 @@ async function sendMailWithSmtp(recipients, subject, body) {
   ]);
 }
 
+async function sendMailWithBrevo(recipients, subject, body) {
+  const providerStatus = getMailProviderStatus();
+  if (!providerStatus.configured) {
+    throw new Error(`Mail ayarlari eksik: ${providerStatus.missing.join(", ")}`);
+  }
+
+  const config = getMailConfig();
+  const endpoint = `${config.brevoApiBaseUrl.replace(/\/+$/g, "")}/v3/smtp/email`;
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "content-type": "application/json",
+      "api-key": config.brevoApiKey,
+    },
+    body: JSON.stringify({
+      sender: {
+        email: config.senderAddress,
+        name: config.senderName,
+      },
+      to: recipients.map((recipient) => ({ email: recipient })),
+      subject,
+      htmlContent: `<html><body><p>${body.replace(/\n/g, "<br>")}</p></body></html>`,
+      textContent: body,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Brevo API hatasi: ${response.status} ${errorText}`);
+  }
+}
+
 async function sendMailToRecipients(recipients, subject, body, logLabel) {
   const results = [];
 
   try {
-    await sendMailWithSmtp(recipients, subject, body);
+    if (mailProviderMode === "brevo") {
+      await sendMailWithBrevo(recipients, subject, body);
+    } else {
+      await sendMailWithSmtp(recipients, subject, body);
+    }
+
     recipients.forEach((recipient) => {
       storeCache.notifications.unshift(`Mail bildirimi gonderildi: ${recipient} / ${logLabel}`);
       storeCache.logs.unshift(`${timestampNow()} - system, ${recipient} adresine mail gonderdi: ${logLabel}.`);

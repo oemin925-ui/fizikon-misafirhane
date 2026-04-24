@@ -20,16 +20,12 @@ services:
           name: fizikon-misafirhane-db
           property: connectionString
       - key: MAIL_PROVIDER_MODE
-        value: disabled
+        value: brevo
+      - key: MAIL_FROM_NAME
+        value: Fizikon Misafirhane
       - key: MAIL_FROM_ADDRESS
         value: bilgiislem@fizikon.com
-      - key: MAIL_SMTP_HOST
-        value: smtp.yandex.com
-      - key: MAIL_SMTP_PORT
-        value: "587"
-      - key: MAIL_SMTP_SECURE
-        value: "true"
-      - key: MAIL_SMTP_USERNAME
-        value: bilgiislem@fizikon.com
-      - key: MAIL_SMTP_PASSWORD
+      - key: BREVO_API_BASE_URL
+        value: https://api.brevo.com
+      - key: BREVO_API_KEY
         sync: false
