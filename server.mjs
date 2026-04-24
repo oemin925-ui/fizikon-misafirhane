@@ -769,6 +769,20 @@ function buildTestMailBody() {
   return `Bu bir test mailidir. Sistem hazir. Saat ${timestampNow()}.`;
 }
 
+function buildReservationCreatedMailSubject() {
+  return "Misafirhane randevunuz olusturulmustur";
+}
+
+function buildReservationCreatedMailBody() {
+  return [
+    "Misafirhane randevunuz oluşturulmuştur!",
+    "",
+    "Randevu detaylarınızı kontrol etmeyi unutmayın. Belirlenen gün ve saatte hazır bulunmanız rica olunur.",
+    "",
+    "📌 Misafirhane randevunuz var — lütfen bilgilerinizi gözden geçirin.",
+  ].join("\n");
+}
+
 async function sendMailWithSmtp(recipients, subject, body) {
   const providerStatus = getMailProviderStatus();
   if (!providerStatus.configured) {
@@ -1316,6 +1330,15 @@ async function handleCreateReservation(request, response) {
   }
 
   await saveStore();
+  if (storeCache.mailSettings.recipients.length > 0 && isMailProviderConfigured()) {
+    await sendMailToRecipients(
+      storeCache.mailSettings.recipients,
+      buildReservationCreatedMailSubject(),
+      buildReservationCreatedMailBody(),
+      `${reservation.apartment} / ${reservation.guestName} / olusturma`,
+    );
+  }
+
   sendJson(response, 200, buildAuthPayload(auth.user));
 }
 
