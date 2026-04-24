@@ -1,14 +1,35 @@
+databases:
+  - name: fizikon-misafirhane-db
+    plan: free
+    region: frankfurt
+    databaseName: fizikonmisafirhane
+    user: fizikonmisafirhane
+
 services:
   - type: web
-    name: fizikon-misafirhane
+    name: fizikonmisafirhane
     runtime: node
-    plan: starter
+    plan: free
+    region: frankfurt
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
-      - key: DATA_DIR
-        value: /opt/render/project/src/data
-    disk:
-      name: app-data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fizikon-misafirhane-db
+          property: connectionString
+      - key: MAIL_PROVIDER_MODE
+        value: disabled
+      - key: MAIL_FROM_ADDRESS
+        value: bilgiislem@fizikon.com
+      - key: MAIL_SMTP_HOST
+        value: smtp.yandex.com
+      - key: MAIL_SMTP_PORT
+        value: "587"
+      - key: MAIL_SMTP_SECURE
+        value: "true"
+      - key: MAIL_SMTP_USERNAME
+        value: bilgiislem@fizikon.com
+      - key: MAIL_SMTP_PASSWORD
+        sync: false

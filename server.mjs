@@ -5,6 +5,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
 import { promisify } from "node:util";
+import { Pool } from "pg";
 
 const rootDir = process.cwd();
 const envFilePath = path.join(rootDir, ".env");
@@ -41,9 +42,12 @@ loadEnvFile();
 
 const host = process.env.HOST || "0.0.0.0";
 const port = Number(process.env.PORT || 4184);
+const databaseUrl = typeof process.env.DATABASE_URL === "string" ? process.env.DATABASE_URL.trim() : "";
+const databaseSslMode = typeof process.env.DATABASE_SSL === "string" ? process.env.DATABASE_SSL.trim().toLowerCase() : "";
 const dataDir = path.resolve(process.env.DATA_DIR || path.join(rootDir, "data"));
 const dataFilePath = path.join(dataDir, "app-data.json");
 const importedSeedPath = path.join(rootDir, "reservation_seed.json");
+const storageMode = databaseUrl ? "postgres" : "file";
 
 const DEFAULT_ADMIN_USERNAME = "admin";
 const DEFAULT_ADMIN_PASSWORD = "admin";
@@ -52,6 +56,9 @@ const DEFAULT_MAIL_LEAD_MINUTES = Number(process.env.MAIL_REMINDER_LEAD_MINUTES 
 const MAIL_CHECK_INTERVAL_MS = Number(process.env.MAIL_CHECK_INTERVAL_MS || 60_000);
 const MAIL_FAILURE_BACKOFF_MS = 30 * 60 * 1000;
 const DEFAULT_MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || "bilgiislem@fizikon.com";
+const mailProviderMode = typeof process.env.MAIL_PROVIDER_MODE === "string"
+  ? process.env.MAIL_PROVIDER_MODE.trim().toLowerCase()
+  : "smtp";
 const MONTH_INDEXES = {
   ocak: 0,
   subat: 1,
@@ -156,6 +163,7 @@ let importedBusyByApartmentCache = {};
 let storeCache = null;
 let mailCheckInProgress = false;
 const mailFailureBackoff = new Map();
+let databasePool = null;
 
 function cloneDefaultStore() {
   return JSON.parse(JSON.stringify(DEFAULT_STORE));
@@ -395,6 +403,81 @@ async function writeStoreFile(store) {
   await fs.rename(tempPath, dataFilePath);
 }
 
+function getDatabasePool() {
+  if (!databaseUrl) {
+    return null;
+  }
+
+  if (!databasePool) {
+    const useSsl = databaseSslMode === "true" || databaseSslMode === "require";
+    databasePool = new Pool({
+      connectionString: databaseUrl,
+      ssl: useSsl ? { rejectUnauthorized: false } : false,
+    });
+  }
+
+  return databasePool;
+}
+
+async function ensureDatabaseStoreTable() {
+  const pool = getDatabasePool();
+  if (!pool) {
+    return;
+  }
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS app_state (
+      id SMALLINT PRIMARY KEY,
+      data JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+}
+
+async function readStoreFileIfExists() {
+  try {
+    const rawContent = await fs.readFile(dataFilePath, "utf8");
+    return normalizeStore(JSON.parse(rawContent));
+  } catch {
+    return null;
+  }
+}
+
+async function readStoreFromDatabase() {
+  const pool = getDatabasePool();
+  if (!pool) {
+    return null;
+  }
+
+  await ensureDatabaseStoreTable();
+  const result = await pool.query("SELECT data FROM app_state WHERE id = 1");
+  if (!result.rows[0]?.data) {
+    return null;
+  }
+
+  return normalizeStore(result.rows[0].data);
+}
+
+async function writeStoreToDatabase(store) {
+  const pool = getDatabasePool();
+  if (!pool) {
+    return;
+  }
+
+  await ensureDatabaseStoreTable();
+  await pool.query(
+    `
+      INSERT INTO app_state (id, data, updated_at)
+      VALUES (1, $1::jsonb, NOW())
+      ON CONFLICT (id)
+      DO UPDATE SET
+        data = EXCLUDED.data,
+        updated_at = NOW()
+    `,
+    [JSON.stringify(store)],
+  );
+}
+
 async function loadImportedData() {
   if (importedDataCache) {
     return importedDataCache;
@@ -413,18 +496,36 @@ async function loadStore() {
 
   await loadImportedData();
 
-  try {
-    const rawContent = await fs.readFile(dataFilePath, "utf8");
-    storeCache = normalizeStore(JSON.parse(rawContent));
-  } catch {
-    storeCache = normalizeStore(DEFAULT_STORE);
-    await writeStoreFile(storeCache);
+  if (storageMode === "postgres") {
+    const databaseStore = await readStoreFromDatabase();
+    if (databaseStore) {
+      storeCache = databaseStore;
+      return storeCache;
+    }
+
+    const fileStore = await readStoreFileIfExists();
+    storeCache = fileStore ?? normalizeStore(DEFAULT_STORE);
+    await writeStoreToDatabase(storeCache);
+    return storeCache;
   }
 
+  const fileStore = await readStoreFileIfExists();
+  if (fileStore) {
+    storeCache = fileStore;
+    return storeCache;
+  }
+
+  storeCache = normalizeStore(DEFAULT_STORE);
+  await writeStoreFile(storeCache);
   return storeCache;
 }
 
 async function saveStore() {
+  if (storageMode === "postgres") {
+    await writeStoreToDatabase(storeCache);
+    return;
+  }
+
   await writeStoreFile(storeCache);
 }
 
@@ -461,6 +562,15 @@ function getMailProviderStatus() {
   const config = getMailConfig();
   const missing = [];
 
+  if (mailProviderMode === "disabled") {
+    return {
+      configured: false,
+      disabled: true,
+      missing: ["MAIL_PROVIDER_MODE_DISABLED"],
+      senderAddress: config.senderAddress,
+    };
+  }
+
   if (!config.senderAddress) {
     missing.push("MAIL_FROM_ADDRESS");
   }
@@ -479,6 +589,7 @@ function getMailProviderStatus() {
 
   return {
     configured: missing.length === 0,
+    disabled: false,
     missing,
     senderAddress: config.senderAddress,
   };
@@ -494,6 +605,7 @@ function buildMailSettingsForClient() {
     recipients: [...storeCache.mailSettings.recipients],
     leadMinutes: storeCache.mailSettings.leadMinutes,
     senderAddress: providerStatus.senderAddress,
+    providerDisabled: providerStatus.disabled === true,
     providerReady: providerStatus.configured,
     providerMissing: providerStatus.missing,
   };
@@ -1401,6 +1513,14 @@ async function handleSendTestMail(request, response) {
 
   if (!isMailProviderConfigured()) {
     const providerStatus = getMailProviderStatus();
+    if (providerStatus.disabled) {
+      sendJson(response, 400, {
+        error: "Mail gonderimi bu sunucuda kapali.",
+        ...buildAuthPayload(auth.user),
+      });
+      return;
+    }
+
     sendJson(response, 400, {
       error: `Mail ayarlari eksik. Doldurulmasi gereken alanlar: ${providerStatus.missing.join(", ")}. Sonra sunucuyu yeniden baslatin.`,
       ...buildAuthPayload(auth.user),
@@ -1443,8 +1563,12 @@ const server = http.createServer(async (request, response) => {
       sendJson(response, 200, {
         ok: true,
         app: "fizikon-misafirhane-paneli",
-        persistentDataFile: dataFilePath,
+        storageMode,
+        persistentDataFile: storageMode === "file" ? dataFilePath : null,
+        persistentDataStore: storageMode === "postgres" ? "postgres" : "local-file",
+        databaseConfigured: storageMode === "postgres",
         mailProviderConfigured: mailProviderStatus.configured,
+        mailProviderDisabled: mailProviderStatus.disabled === true,
         mailProviderMissing: mailProviderStatus.missing,
         mailRecipientCount: storeCache.mailSettings.recipients.length,
         mailSenderAddress: mailProviderStatus.senderAddress,
@@ -1548,5 +1672,9 @@ void checkUpcomingReservationMail();
 
 server.listen(port, host, () => {
   console.log(`Fizikon Misafirhane Paneli calisiyor: http://${host}:${port}/`);
-  console.log(`Kalici veri dosyasi: ${dataFilePath}`);
+  if (storageMode === "postgres") {
+    console.log("Kalici veri kaynagi: PostgreSQL");
+  } else {
+    console.log(`Kalici veri dosyasi: ${dataFilePath}`);
+  }
 });
