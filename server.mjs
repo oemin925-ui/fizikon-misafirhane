@@ -96,6 +96,7 @@ const DEFAULT_STORE = {
       id: 1,
       apartment: "2 Nolu Daire",
       guestName: "Emin",
+      createdByUsername: DEFAULT_ADMIN_USERNAME,
       checkIn: "2026-04-22",
       checkOut: "2026-04-25",
       arrivalTime: "14:30",
@@ -107,6 +108,7 @@ const DEFAULT_STORE = {
       id: 2,
       apartment: "5 Nolu Daire",
       guestName: "Veronika Shostakevich",
+      createdByUsername: DEFAULT_ADMIN_USERNAME,
       checkIn: "2026-07-01",
       checkOut: "2026-07-10",
       arrivalTime: "11:00",
@@ -118,6 +120,7 @@ const DEFAULT_STORE = {
       id: 3,
       apartment: "8 Nolu Daire",
       guestName: "Alparslan Cekic",
+      createdByUsername: DEFAULT_ADMIN_USERNAME,
       checkIn: "2026-05-05",
       checkOut: "2026-05-09",
       arrivalTime: "09:00",
@@ -326,6 +329,7 @@ function normalizeReservations(rawReservations) {
         id: Number(reservation?.id) || index + 1,
         apartment: normalizeText(reservation?.apartment),
         guestName: normalizeText(reservation?.guestName),
+        createdByUsername: normalizeText(reservation?.createdByUsername) || DEFAULT_ADMIN_USERNAME,
         checkIn: normalizeText(reservation?.checkIn),
         checkOut: normalizeText(reservation?.checkOut),
         arrivalTime: normalizeText(reservation?.arrivalTime),
@@ -631,10 +635,39 @@ function buildMailSettingsForClient() {
   };
 }
 
+function canManageReservation(user, reservation) {
+  if (!user || !reservation) {
+    return false;
+  }
+
+  return user.role === "Admin" || reservation.createdByUsername === user.username;
+}
+
+function sanitizeReservationForUser(reservation, user) {
+  const visibleToUser = canManageReservation(user, reservation);
+
+  return {
+    ...reservation,
+    guestName: visibleToUser ? reservation.guestName : "Rezervasyon",
+    arrivalTime: visibleToUser ? reservation.arrivalTime : "",
+    checkoutTime: visibleToUser ? reservation.checkoutTime : "",
+    status: visibleToUser ? reservation.status : "Rezervasyon",
+    source: visibleToUser ? reservation.source : "panel",
+    createdByUsername: visibleToUser ? reservation.createdByUsername : "",
+    canEdit: visibleToUser,
+  };
+}
+
+function getReservationsForUser(user) {
+  return storeCache.reservations
+    .filter((reservation) => canManageReservation(user, reservation))
+    .map((reservation) => sanitizeReservationForUser(reservation, user));
+}
+
 function buildClientData(user) {
   return {
     nextReservationId: storeCache.nextReservationId,
-    reservations: storeCache.reservations,
+    reservations: getReservationsForUser(user),
     users: user?.role === "Admin" ? storeCache.users : [],
     logs: user?.role === "Admin" ? storeCache.logs : [],
     notifications: user?.role === "Admin" ? storeCache.notifications : [],
@@ -721,6 +754,12 @@ function getReservationStartDateTime(reservation) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+function getReservationEndDateTime(reservation) {
+  const checkoutTime = normalizeText(reservation?.checkoutTime) || "00:00";
+  const date = new Date(`${reservation?.checkOut}T${checkoutTime}:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function buildMailReminderKey(reservation, recipient, reminderType) {
   if (reminderType === "departure") {
     return `${reservation.id}|departure|${reservation.checkOut}|${reservation.checkoutTime}|${recipient}`;
@@ -729,19 +768,22 @@ function buildMailReminderKey(reservation, recipient, reminderType) {
   return `${reservation.id}|arrival|${reservation.checkIn}|${reservation.arrivalTime}|${recipient}`;
 }
 
-function buildArrivalDayLabel(checkInDate) {
-  const today = toIso(new Date());
-  const tomorrow = toIso(addDays(new Date(), 1));
+function buildReservationDetailLine(reservation) {
+  return `${reservation.apartment} / Giris: ${formatDisplayDate(reservation.checkIn)} ${reservation.arrivalTime} / Cikis: ${formatDisplayDate(reservation.checkOut)} ${reservation.checkoutTime}`;
+}
 
-  if (checkInDate === today) {
-    return "Bugun";
+function buildReservationNotificationMessage(reservation, reminderType = "created") {
+  const detailLine = buildReservationDetailLine(reservation);
+
+  if (reminderType === "arrival") {
+    return `Yaklasan giris: ${detailLine}`;
   }
 
-  if (checkInDate === tomorrow) {
-    return "Yarin";
+  if (reminderType === "departure") {
+    return `Yaklasan cikis: ${detailLine}`;
   }
 
-  return `${formatDisplayDate(checkInDate)} tarihinde`;
+  return `Rezervasyon olusturuldu: ${detailLine}`;
 }
 
 function buildMailSubject(reservation, reminderType) {
@@ -753,12 +795,25 @@ function buildMailSubject(reservation, reminderType) {
 }
 
 function buildMailBody(reservation, reminderType) {
+  const detailLine = buildReservationDetailLine(reservation);
+
   if (reminderType === "departure") {
-    return `Bugun ${reservation.apartment} rezervasyonu bitiyor. Saat ${reservation.checkoutTime}'de cikis bekleniyor.`;
+    return [
+      "Rezervasyon cikis bildirimi:",
+      detailLine,
+      "",
+      "Cikis saati yaklasti. Otomatik bilgilendirme gonderildi.",
+    ].join("\n");
   }
 
-  const dayLabel = buildArrivalDayLabel(reservation.checkIn);
-  return `${dayLabel} ${reservation.apartment} icin randevu var. Saat ${reservation.arrivalTime}'da gelmesi bekleniyor.`;
+  return [
+    reminderType === "arrival" ? "Rezervasyon giris bildirimi:" : "Rezervasyon olusturuldu:",
+    detailLine,
+    "",
+    reminderType === "arrival"
+      ? "Giris saati yaklasti. Otomatik bilgilendirme gonderildi."
+      : "Rezervasyon kaydi olusturuldu.",
+  ].join("\n");
 }
 
 function buildTestMailSubject() {
@@ -886,21 +941,19 @@ async function checkUpcomingReservationMail() {
   await loadStore();
 
   const recipients = storeCache.mailSettings.recipients;
-  if (recipients.length === 0 || !isMailProviderConfigured()) {
-    return;
-  }
+  const canSendMail = recipients.length > 0 && isMailProviderConfigured();
 
   mailCheckInProgress = true;
 
   try {
     const now = new Date();
     const nowMs = now.getTime();
-    const todayIso = toIso(now);
     const leadMs = Math.max(storeCache.mailSettings.leadMinutes, 1) * 60 * 1000;
 
     for (const reservation of storeCache.reservations) {
       const reminderPlans = [];
       const reservationStart = getReservationStartDateTime(reservation);
+      const reservationEnd = getReservationEndDateTime(reservation);
 
       if (reservationStart) {
         const reservationStartMs = reservationStart.getTime();
@@ -914,14 +967,31 @@ async function checkUpcomingReservationMail() {
         }
       }
 
-      if (reservation.checkOut === todayIso) {
-        reminderPlans.push({
-          reminderType: "departure",
-          logLabel: `${reservation.apartment} / ${reservation.guestName} / cikis`,
-        });
+      if (reservationEnd) {
+        const reservationEndMs = reservationEnd.getTime();
+        const diffMs = reservationEndMs - nowMs;
+
+        if (diffMs >= 0 && diffMs <= leadMs) {
+          reminderPlans.push({
+            reminderType: "departure",
+            logLabel: `${reservation.apartment} / ${reservation.guestName} / cikis`,
+          });
+        }
       }
 
       for (const plan of reminderPlans) {
+        const panelReminderKey = buildMailReminderKey(reservation, "panel", plan.reminderType);
+        if (!storeCache.mailSettings.sentReminderKeys.includes(panelReminderKey)) {
+          storeCache.notifications.unshift(buildReservationNotificationMessage(reservation, plan.reminderType));
+          storeCache.mailSettings.sentReminderKeys.unshift(panelReminderKey);
+          storeCache.mailSettings.sentReminderKeys = [...new Set(storeCache.mailSettings.sentReminderKeys)];
+          await saveStore();
+        }
+
+        if (!canSendMail) {
+          continue;
+        }
+
         const pendingRecipients = recipients.filter((recipient) => {
           const reminderKey = buildMailReminderKey(reservation, recipient, plan.reminderType);
           const backoffUntil = mailFailureBackoff.get(reminderKey) || 0;
@@ -1042,7 +1112,7 @@ function validateMailSettingsInput(rawSettings) {
       recipients,
       leadMinutes: storeCache.mailSettings.leadMinutes,
       sentReminderKeys: storeCache.mailSettings.sentReminderKeys.filter((key) =>
-        recipients.some((recipient) => key.endsWith(`|${recipient}`)),
+        key.endsWith("|panel") || recipients.some((recipient) => key.endsWith(`|${recipient}`)),
       ),
     },
   };
@@ -1310,23 +1380,25 @@ async function handleCreateReservation(request, response) {
 
   const createdReservation = {
     id: storeCache.nextReservationId,
+    createdByUsername: auth.user.username,
     ...reservation,
   };
 
   storeCache.nextReservationId += 1;
   storeCache.reservations.unshift(createdReservation);
-  storeCache.notifications.unshift(
-    `Randevu olusturuldu: ${reservation.apartment} / ${reservation.guestName} / ${formatDisplayDate(reservation.checkIn)} ${reservation.arrivalTime}`,
-  );
+  storeCache.notifications.unshift(buildReservationNotificationMessage(createdReservation, "created"));
   storeCache.logs.unshift(
     `${timestampNow()} - ${auth.user.username}, ${reservation.guestName} icin rezervasyon olusturdu.`,
   );
 
-  const diffDays = Math.round((new Date(reservation.checkIn) - new Date(FIXED_TODAY)) / (1000 * 60 * 60 * 24));
-  if (diffDays >= 0 && diffDays <= 1) {
-    storeCache.notifications.unshift(
-      `Yaklasan rezervasyon: ${reservation.apartment} / ${reservation.guestName} / ${reservation.arrivalTime}`,
-    );
+  const createdReservationStart = getReservationStartDateTime(createdReservation);
+  const leadMs = Math.max(storeCache.mailSettings.leadMinutes, 1) * 60 * 1000;
+  const isArrivalSoon = createdReservationStart
+    ? createdReservationStart.getTime() - Date.now() <= leadMs && createdReservationStart.getTime() - Date.now() >= 0
+    : false;
+
+  if (isArrivalSoon) {
+    storeCache.notifications.unshift(buildReservationNotificationMessage(createdReservation, "arrival"));
   }
 
   await saveStore();
@@ -1334,7 +1406,7 @@ async function handleCreateReservation(request, response) {
     await sendMailToRecipients(
       storeCache.mailSettings.recipients,
       buildReservationCreatedMailSubject(),
-      buildReservationCreatedMailBody(),
+      buildMailBody(createdReservation, "created"),
       `${reservation.apartment} / ${reservation.guestName} / olusturma`,
     );
   }
@@ -1352,6 +1424,14 @@ async function handleUpdateReservation(request, response, reservationId) {
   if (!selectedReservation) {
     sendJson(response, 404, {
       error: "Duzenlenecek randevu bulunamadi.",
+      ...buildAuthPayload(auth.user),
+    });
+    return;
+  }
+
+  if (!canManageReservation(auth.user, selectedReservation)) {
+    sendJson(response, 403, {
+      error: "Bu rezervasyonu sadece olusturan kullanici veya admin duzenleyebilir.",
       ...buildAuthPayload(auth.user),
     });
     return;
@@ -1417,6 +1497,14 @@ async function handleDeleteReservation(request, response, reservationId) {
   if (reservationIndex === -1) {
     sendJson(response, 404, {
       error: "Silinecek randevu bulunamadi.",
+      ...buildAuthPayload(auth.user),
+    });
+    return;
+  }
+
+  if (!canManageReservation(auth.user, storeCache.reservations[reservationIndex])) {
+    sendJson(response, 403, {
+      error: "Bu rezervasyonu sadece olusturan kullanici veya admin silebilir.",
       ...buildAuthPayload(auth.user),
     });
     return;

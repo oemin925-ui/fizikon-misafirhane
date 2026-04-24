@@ -679,6 +679,17 @@ function getSelectedReservation() {
   return createdReservations.find((reservation) => reservation.id === state.selectedReservationId) || null;
 }
 
+function canEditReservation(reservation) {
+  return Boolean(reservation?.canEdit);
+}
+
+function buildReservationSummary(reservation) {
+  const ownerLabel = isAdminSession() && reservation?.createdByUsername
+    ? ` / Olusturan: ${reservation.createdByUsername}`
+    : "";
+  return `${reservation.guestName} / ${formatDisplayDate(reservation.checkIn)} - ${formatDisplayDate(reservation.checkOut)}${ownerLabel}`;
+}
+
 function getPanelReservationsForDate(apartment, isoDate) {
   return createdReservations
     .filter((reservation) => reservation.apartment === apartment && reservationTouchesDate(reservation, isoDate))
@@ -686,7 +697,7 @@ function getPanelReservationsForDate(apartment, isoDate) {
 }
 
 function getReservationForDateSelection(apartment, isoDate) {
-  const reservations = getPanelReservationsForDate(apartment, isoDate);
+  const reservations = getPanelReservationsForDate(apartment, isoDate).filter((reservation) => canEditReservation(reservation));
   if (reservations.length === 0) {
     return null;
   }
@@ -709,23 +720,41 @@ function updateActionButtons() {
   if (!selectedReservation) {
     elements.selectionStatus.textContent = "Duzenle ve sil icin takvimde panelden olusturulmus bir randevuya tiklayin.";
     elements.cancelEditButton.classList.add("hidden");
+    elements.editReservationButton.disabled = true;
+    elements.deleteReservationButton.disabled = true;
     return;
   }
 
-  elements.selectionStatus.textContent = `Secilen kayit: ${selectedReservation.guestName} / ${formatDisplayDate(selectedReservation.checkIn)} - ${formatDisplayDate(selectedReservation.checkOut)}`;
+  if (!canEditReservation(selectedReservation)) {
+    elements.selectionStatus.textContent = "Bu rezervasyonu sadece olusturan kullanici veya admin duzenleyebilir.";
+    elements.cancelEditButton.classList.add("hidden");
+    elements.editReservationButton.disabled = true;
+    elements.deleteReservationButton.disabled = true;
+    return;
+  }
+
+  elements.selectionStatus.textContent = `Secilen kayit: ${buildReservationSummary(selectedReservation)}`;
   elements.cancelEditButton.classList.remove("hidden");
+  elements.editReservationButton.disabled = false;
+  elements.deleteReservationButton.disabled = false;
 }
 
 function createdNotesForDate(apartment, isoDate) {
   return createdReservations
     .filter((reservation) => reservation.apartment === apartment && reservationTouchesDate(reservation, isoDate))
-    .map((reservation) => (reservation.checkIn === isoDate ? `${reservation.guestName} ${reservation.arrivalTime}` : reservation.guestName));
+    .map((reservation) => {
+      if (!canEditReservation(reservation)) {
+        return "Rezervasyon";
+      }
+
+      return reservation.checkIn === isoDate ? `${reservation.guestName} ${reservation.arrivalTime}` : reservation.guestName;
+    });
 }
 
 function getCalendarNotes(apartment, isoDate) {
   const importedNotes = state.busyByApartment[apartment]?.[isoDate] || [];
   const panelNotes = createdNotesForDate(apartment, isoDate);
-  return [...new Set([...importedNotes, ...panelNotes])];
+  return [...new Set([...panelNotes, ...importedNotes])];
 }
 
 function renderCalendar() {
@@ -746,15 +775,21 @@ function renderCalendar() {
 
       const notes = getCalendarNotes(state.selectedApartment, cell.isoDate);
       const panelReservations = getPanelReservationsForDate(state.selectedApartment, cell.isoDate);
-      const noteMarkup = notes.length > 0 ? notes.slice(0, 3).map((note) => `<span>${note}</span>`).join("") : "<span>Bos</span>";
+      const visibleNotes = notes.length > 0 ? notes.slice(0, 4) : [];
+      const noteMarkup = visibleNotes.length > 0
+        ? visibleNotes.map((note) => `<span>${note}</span>`).join("")
+        : "<span>Bos</span>";
       const busyClass = notes.length > 0 ? "busy" : "";
-      const selectableClass = panelReservations.length > 0 ? "selectable" : "";
+      const selectableClass = panelReservations.some((reservation) => canEditReservation(reservation)) ? "selectable" : "";
+      const lockedClass = panelReservations.length > 0 && !panelReservations.some((reservation) => canEditReservation(reservation))
+        ? "locked"
+        : "";
       const selectedClass = state.selectedReservationId && panelReservations.some((reservation) => reservation.id === state.selectedReservationId)
         ? "selected"
         : "";
 
       return `
-        <div class="day ${busyClass} ${selectableClass} ${selectedClass}" data-iso-date="${cell.isoDate}">
+        <div class="day ${busyClass} ${selectableClass} ${lockedClass} ${selectedClass}" data-iso-date="${cell.isoDate}">
           <strong>${cell.dayLabel}</strong>
           ${noteMarkup}
         </div>
@@ -790,11 +825,11 @@ function buildExportRows() {
     "Panel Kaydi",
     reservation.apartment,
     reservation.checkIn,
-    reservation.guestName,
-    reservation.checkIn,
-    reservation.checkOut,
-    reservation.arrivalTime,
-    reservation.checkoutTime,
+    canEditReservation(reservation) ? reservation.guestName : "Rezervasyon",
+    canEditReservation(reservation) ? reservation.checkIn : "",
+    canEditReservation(reservation) ? reservation.checkOut : "",
+    canEditReservation(reservation) ? reservation.arrivalTime : "",
+    canEditReservation(reservation) ? reservation.checkoutTime : "",
   ]);
 
   const rows = [
@@ -882,7 +917,7 @@ function resetForm() {
 
 function selectReservation(id) {
   const reservation = createdReservations.find((item) => item.id === id);
-  if (!reservation) {
+  if (!reservation || !canEditReservation(reservation)) {
     return;
   }
 
@@ -963,6 +998,11 @@ async function handleUpdateReservation() {
     return;
   }
 
+  if (!canEditReservation(selectedReservation)) {
+    showConflict("Bu rezervasyonu sadece olusturan kullanici veya admin duzenleyebilir.");
+    return;
+  }
+
   const actor = requireLoggedInUser();
   if (!actor) {
     return;
@@ -1017,6 +1057,11 @@ async function handleDeleteReservation() {
   const reservation = getSelectedReservation();
   if (!reservation) {
     showConflict("Silmek icin once takvimden bir panel randevusu secin.");
+    return;
+  }
+
+  if (!canEditReservation(reservation)) {
+    showConflict("Bu rezervasyonu sadece olusturan kullanici veya admin silebilir.");
     return;
   }
 
@@ -1431,6 +1476,15 @@ function bindEvents() {
   elements.calendar.addEventListener("click", (event) => {
     const day = event.target.closest(".day[data-iso-date]");
     if (!day) {
+      return;
+    }
+
+    const reservations = getPanelReservationsForDate(state.selectedApartment, day.dataset.isoDate);
+    if (reservations.length > 0 && !reservations.some((reservation) => canEditReservation(reservation))) {
+      state.selectedReservationId = null;
+      updateActionButtons();
+      showConflict("Bu gundeki rezervasyon baska bir kullaniciya ait. Detaylari sadece olusturan kullanici veya admin gorebilir.");
+      renderCalendar();
       return;
     }
 
