@@ -1497,6 +1497,39 @@ async function handleUpdateMailSettings(request, response) {
   sendJson(response, 200, buildAuthPayload(auth.user));
 }
 
+async function handleImportStore(request, response) {
+  const auth = await requireAuth(request, response, true);
+  if (!auth) {
+    return;
+  }
+
+  let body;
+  try {
+    body = await readJsonBody(request);
+  } catch {
+    sendJson(response, 400, {
+      error: "Gecersiz veri aktarma paketi.",
+      ...buildAuthPayload(auth.user),
+    });
+    return;
+  }
+
+  const incomingStore = body?.store ?? body;
+  if (!incomingStore || typeof incomingStore !== "object") {
+    sendJson(response, 400, {
+      error: "Aktarilacak veri bulunamadi.",
+      ...buildAuthPayload(auth.user),
+    });
+    return;
+  }
+
+  storeCache = normalizeStore(incomingStore);
+  await saveStore();
+
+  const refreshedUser = storeCache.users.find((item) => item.active && item.username === auth.user.username) || auth.user;
+  sendJson(response, 200, buildAuthPayload(refreshedUser));
+}
+
 async function handleSendTestMail(request, response) {
   const auth = await requireAuth(request, response, true);
   if (!auth) {
@@ -1628,6 +1661,11 @@ const server = http.createServer(async (request, response) => {
 
     if (pathname === "/api/settings/mail" && request.method === "PUT") {
       await handleUpdateMailSettings(request, response);
+      return;
+    }
+
+    if (pathname === "/api/admin/store/import" && request.method === "POST") {
+      await handleImportStore(request, response);
       return;
     }
 
