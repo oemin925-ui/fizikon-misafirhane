@@ -658,16 +658,10 @@ function sanitizeReservationForUser(reservation, user) {
   };
 }
 
-function getReservationsForUser(user) {
-  return storeCache.reservations
-    .filter((reservation) => canManageReservation(user, reservation))
-    .map((reservation) => sanitizeReservationForUser(reservation, user));
-}
-
 function buildClientData(user) {
   return {
     nextReservationId: storeCache.nextReservationId,
-    reservations: getReservationsForUser(user),
+    reservations: storeCache.reservations.map((reservation) => sanitizeReservationForUser(reservation, user)),
     users: user?.role === "Admin" ? storeCache.users : [],
     logs: user?.role === "Admin" ? storeCache.logs : [],
     notifications: user?.role === "Admin" ? storeCache.notifications : [],
