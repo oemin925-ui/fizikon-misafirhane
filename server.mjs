@@ -51,6 +51,8 @@ const storageMode = databaseUrl ? "postgres" : "file";
 
 const DEFAULT_ADMIN_USERNAME = "admin";
 const DEFAULT_ADMIN_PASSWORD = "admin";
+const DEFAULT_IMPORTED_ARRIVAL_TIME = "14:30";
+const DEFAULT_IMPORTED_CHECKOUT_TIME = "11:00";
 const FIXED_TODAY = "2026-04-22";
 const DEFAULT_MAIL_LEAD_MINUTES = Number(process.env.MAIL_REMINDER_LEAD_MINUTES || 24 * 60);
 const MAIL_CHECK_INTERVAL_MS = Number(process.env.MAIL_CHECK_INTERVAL_MS || 60_000);
@@ -77,6 +79,7 @@ const MONTH_INDEXES = {
 
 const DEFAULT_STORE = {
   nextReservationId: 4,
+  importedReservationsMigrated: false,
   users: [
     {
       username: DEFAULT_ADMIN_USERNAME,
@@ -262,7 +265,7 @@ function addBusyNote(map, apartment, isoDate, note) {
   }
 }
 
-function buildImportedBusyByApartment(rawData) {
+function collectImportedNotesByApartment(rawData, currentMonthOnly = false) {
   const busyMap = {};
 
   const apartments = Array.isArray(rawData?.apartments) ? rawData.apartments : [];
@@ -281,7 +284,12 @@ function buildImportedBusyByApartment(rawData) {
         row.forEach((cellText, columnIndex) => {
           const parsed = parseCell(cellText);
           const gridIndex = rowIndex * 7 + columnIndex;
-          const isoDate = toIso(addDays(gridStart, gridIndex));
+          const date = addDays(gridStart, gridIndex);
+          if (currentMonthOnly && date.getMonth() !== monthIndex) {
+            return;
+          }
+
+          const isoDate = toIso(date);
           addBusyNote(busyMap, apartmentName, isoDate, parsed.note);
         });
       });
@@ -289,6 +297,102 @@ function buildImportedBusyByApartment(rawData) {
   });
 
   return busyMap;
+}
+
+function buildImportedBusyByApartment(rawData) {
+  return collectImportedNotesByApartment(rawData, false);
+}
+
+function buildReservationIdentity(reservation) {
+  return [
+    stripTurkish(reservation.apartment),
+    stripTurkish(reservation.guestName),
+    reservation.checkIn,
+    reservation.checkOut,
+  ].join("|");
+}
+
+function buildImportedReservationsFromSeed(rawData, existingReservations, nextReservationId) {
+  const importedNotesByApartment = collectImportedNotesByApartment(rawData, true);
+  const knownReservations = new Set((existingReservations || []).map((reservation) => buildReservationIdentity(reservation)));
+  const importedReservations = [];
+  let idCursor = nextReservationId;
+
+  const pushImportedReservation = (apartment, guestName, checkIn, checkOut) => {
+    const reservation = {
+      id: idCursor,
+      apartment,
+      guestName,
+      createdByUsername: DEFAULT_ADMIN_USERNAME,
+      checkIn,
+      checkOut,
+      arrivalTime: DEFAULT_IMPORTED_ARRIVAL_TIME,
+      checkoutTime: DEFAULT_IMPORTED_CHECKOUT_TIME,
+      status: "Aktif",
+      source: "word-import",
+    };
+
+    const identity = buildReservationIdentity(reservation);
+    if (knownReservations.has(identity)) {
+      return;
+    }
+
+    knownReservations.add(identity);
+    importedReservations.push(reservation);
+    idCursor += 1;
+  };
+
+  Object.entries(importedNotesByApartment).forEach(([apartment, notesByDate]) => {
+    const datesByNote = new Map();
+
+    Object.keys(notesByDate)
+      .sort()
+      .forEach((isoDate) => {
+        (notesByDate[isoDate] || []).forEach((note) => {
+          const normalizedNote = normalizeText(note);
+          if (!normalizedNote) {
+            return;
+          }
+
+          if (!datesByNote.has(normalizedNote)) {
+            datesByNote.set(normalizedNote, []);
+          }
+
+          datesByNote.get(normalizedNote).push(isoDate);
+        });
+      });
+
+    datesByNote.forEach((dates, guestName) => {
+      const sortedDates = [...new Set(dates)].sort();
+      if (sortedDates.length === 0) {
+        return;
+      }
+
+      let rangeStart = sortedDates[0];
+      let previousDate = sortedDates[0];
+
+      for (let index = 1; index < sortedDates.length; index += 1) {
+        const currentDate = sortedDates[index];
+        const expectedNextDate = toIso(addDays(new Date(previousDate), 1));
+
+        if (currentDate === expectedNextDate) {
+          previousDate = currentDate;
+          continue;
+        }
+
+        pushImportedReservation(apartment, guestName, rangeStart, previousDate);
+        rangeStart = currentDate;
+        previousDate = currentDate;
+      }
+
+      pushImportedReservation(apartment, guestName, rangeStart, previousDate);
+    });
+  });
+
+  return {
+    importedReservations,
+    nextReservationId: idCursor,
+  };
 }
 
 function normalizeUsers(rawUsers) {
@@ -393,6 +497,7 @@ function normalizeStore(rawStore) {
       highestReservationId + 1,
       1,
     ),
+    importedReservationsMigrated: rawStore?.importedReservationsMigrated === true,
     users: normalizeUsers(rawStore?.users ?? baseStore.users),
     reservations,
     notifications: normalizeMessages(rawStore?.notifications ?? baseStore.notifications),
@@ -505,11 +610,30 @@ async function loadStore() {
     const databaseStore = await readStoreFromDatabase();
     if (databaseStore) {
       storeCache = databaseStore;
+      if (!storeCache.importedReservationsMigrated) {
+        const migration = buildImportedReservationsFromSeed(importedDataCache, storeCache.reservations, storeCache.nextReservationId);
+        if (migration.importedReservations.length > 0) {
+          storeCache.reservations.push(...migration.importedReservations);
+          storeCache.nextReservationId = migration.nextReservationId;
+          storeCache.logs.unshift(`${timestampNow()} - system, Word aktarim kayitlari duzenlenebilir rezervasyonlara donusturuldu.`);
+        }
+        storeCache.importedReservationsMigrated = true;
+        await writeStoreToDatabase(storeCache);
+      }
       return storeCache;
     }
 
     const fileStore = await readStoreFileIfExists();
     storeCache = fileStore ?? normalizeStore(DEFAULT_STORE);
+    if (!storeCache.importedReservationsMigrated) {
+      const migration = buildImportedReservationsFromSeed(importedDataCache, storeCache.reservations, storeCache.nextReservationId);
+      if (migration.importedReservations.length > 0) {
+        storeCache.reservations.push(...migration.importedReservations);
+        storeCache.nextReservationId = migration.nextReservationId;
+        storeCache.logs.unshift(`${timestampNow()} - system, Word aktarim kayitlari duzenlenebilir rezervasyonlara donusturuldu.`);
+      }
+      storeCache.importedReservationsMigrated = true;
+    }
     await writeStoreToDatabase(storeCache);
     return storeCache;
   }
@@ -517,10 +641,29 @@ async function loadStore() {
   const fileStore = await readStoreFileIfExists();
   if (fileStore) {
     storeCache = fileStore;
+    if (!storeCache.importedReservationsMigrated) {
+      const migration = buildImportedReservationsFromSeed(importedDataCache, storeCache.reservations, storeCache.nextReservationId);
+      if (migration.importedReservations.length > 0) {
+        storeCache.reservations.push(...migration.importedReservations);
+        storeCache.nextReservationId = migration.nextReservationId;
+        storeCache.logs.unshift(`${timestampNow()} - system, Word aktarim kayitlari duzenlenebilir rezervasyonlara donusturuldu.`);
+      }
+      storeCache.importedReservationsMigrated = true;
+      await writeStoreFile(storeCache);
+    }
     return storeCache;
   }
 
   storeCache = normalizeStore(DEFAULT_STORE);
+  if (!storeCache.importedReservationsMigrated) {
+    const migration = buildImportedReservationsFromSeed(importedDataCache, storeCache.reservations, storeCache.nextReservationId);
+    if (migration.importedReservations.length > 0) {
+      storeCache.reservations.push(...migration.importedReservations);
+      storeCache.nextReservationId = migration.nextReservationId;
+      storeCache.logs.unshift(`${timestampNow()} - system, Word aktarim kayitlari duzenlenebilir rezervasyonlara donusturuldu.`);
+    }
+    storeCache.importedReservationsMigrated = true;
+  }
   await writeStoreFile(storeCache);
   return storeCache;
 }
@@ -640,7 +783,7 @@ function canManageReservation(user, reservation) {
     return false;
   }
 
-  return user.role === "Admin" || reservation.createdByUsername === user.username;
+  return reservation.source === "word-import" || user.role === "Admin" || reservation.createdByUsername === user.username;
 }
 
 function sanitizeReservationForUser(reservation, user) {
@@ -724,7 +867,9 @@ function listConflictDates(apartment, checkIn, checkOut, ignoreReservationId = n
 
   while (cursor <= end) {
     const isoDate = toIso(cursor);
-    const imported = importedBusyByApartmentCache[apartment]?.[isoDate] || [];
+    const imported = storeCache.importedReservationsMigrated
+      ? []
+      : importedBusyByApartmentCache[apartment]?.[isoDate] || [];
     const created = storeCache.reservations.filter(
       (reservation) =>
         reservation.id !== ignoreReservationId &&
@@ -1031,7 +1176,7 @@ function validateReservationInput(rawReservation) {
     arrivalTime: normalizeText(rawReservation?.arrivalTime),
     checkoutTime: normalizeText(rawReservation?.checkoutTime),
     status: "Planlandi",
-    source: "panel",
+    source: rawReservation?.source === "word-import" ? "word-import" : "panel",
   };
 
   if (!reservation.apartment || !reservation.guestName || !reservation.checkIn || !reservation.checkOut || !reservation.arrivalTime || !reservation.checkoutTime) {
@@ -1468,7 +1613,7 @@ async function handleUpdateReservation(request, response, reservationId) {
   selectedReservation.arrivalTime = reservation.arrivalTime;
   selectedReservation.checkoutTime = reservation.checkoutTime;
   selectedReservation.status = reservation.status;
-  selectedReservation.source = reservation.source;
+  selectedReservation.source = selectedReservation.source === "word-import" ? "word-import" : reservation.source;
 
   storeCache.notifications.unshift(
     `Randevu duzenlendi: ${selectedReservation.apartment} / ${selectedReservation.guestName} / ${formatDisplayDate(selectedReservation.checkIn)} ${selectedReservation.arrivalTime}`,

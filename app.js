@@ -679,6 +679,10 @@ function getSelectedReservation() {
   return createdReservations.find((reservation) => reservation.id === state.selectedReservationId) || null;
 }
 
+function hasMigratedImportedReservations() {
+  return createdReservations.some((reservation) => reservation.source === "word-import");
+}
+
 function canEditReservation(reservation) {
   return Boolean(reservation?.canEdit);
 }
@@ -718,7 +722,7 @@ function updateActionButtons() {
   const selectedReservation = getSelectedReservation();
 
   if (!selectedReservation) {
-    elements.selectionStatus.textContent = "Duzenle ve sil icin takvimde panelden olusturulmus bir randevuya tiklayin.";
+    elements.selectionStatus.textContent = "Duzenle ve sil icin takvimde bir randevuya tiklayin.";
     elements.cancelEditButton.classList.add("hidden");
     elements.editReservationButton.disabled = true;
     elements.deleteReservationButton.disabled = true;
@@ -752,7 +756,9 @@ function createdNotesForDate(apartment, isoDate) {
 }
 
 function getCalendarNotes(apartment, isoDate) {
-  const importedNotes = state.busyByApartment[apartment]?.[isoDate] || [];
+  const importedNotes = state.currentUser && hasMigratedImportedReservations()
+    ? []
+    : state.busyByApartment[apartment]?.[isoDate] || [];
   const panelNotes = createdNotesForDate(apartment, isoDate);
   return [...new Set([...panelNotes, ...importedNotes])];
 }
@@ -857,7 +863,9 @@ function listConflictDates(apartment, checkIn, checkOut, ignoreReservationId = n
 
   while (cursor <= end) {
     const isoDate = toIso(cursor);
-    const imported = state.busyByApartment[apartment]?.[isoDate] || [];
+    const imported = state.currentUser && hasMigratedImportedReservations()
+      ? []
+      : state.busyByApartment[apartment]?.[isoDate] || [];
     const created = createdReservations.filter(
       (reservation) =>
         reservation.id !== ignoreReservationId &&
@@ -968,7 +976,7 @@ async function handleCreateOrUpdate() {
 async function handleUpdateReservation() {
   const selectedReservation = getSelectedReservation();
   if (!selectedReservation) {
-    showConflict("Duzenlemek icin once takvimden bir panel randevusu secin.");
+    showConflict("Duzenlemek icin once takvimden bir randevu secin.");
     return;
   }
 
@@ -1030,7 +1038,7 @@ async function handleUpdateReservation() {
 async function handleDeleteReservation() {
   const reservation = getSelectedReservation();
   if (!reservation) {
-    showConflict("Silmek icin once takvimden bir panel randevusu secin.");
+    showConflict("Silmek icin once takvimden bir randevu secin.");
     return;
   }
 
