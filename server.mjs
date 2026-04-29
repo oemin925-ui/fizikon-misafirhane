@@ -819,16 +819,16 @@ function buildTestMailBody() {
 }
 
 function buildReservationCreatedMailSubject() {
-  return "Misafirhane randevunuz olusturulmustur";
+  return "Daire randevunuz olusturulmustur";
 }
 
 function buildReservationCreatedMailBody() {
   return [
-    "Misafirhane randevunuz oluşturulmuştur!",
+    "Daire randevunuz oluşturulmuştur!",
     "",
     "Randevu detaylarınızı kontrol etmeyi unutmayın. Belirlenen gün ve saatte hazır bulunmanız rica olunur.",
     "",
-    "📌 Misafirhane randevunuz var — lütfen bilgilerinizi gözden geçirin.",
+    "📌 Daire randevunuz var — lütfen bilgilerinizi gözden geçirin.",
   ].join("\n");
 }
 
