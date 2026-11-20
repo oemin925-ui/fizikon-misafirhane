@@ -1,5 +1,5 @@
-const FIXED_TODAY = "2026-04-22";
-const DEFAULT_CHECKOUT = "2026-04-25";
+const FIXED_TODAY = toIso(new Date());
+const DEFAULT_CHECKOUT = toIso(addDays(new Date(), 3));
 const DEFAULT_TIME = "14:30";
 const DEFAULT_CHECKOUT_TIME = "11:00";
 const DEFAULT_ADMIN_USERNAME = "admin";
@@ -56,7 +56,7 @@ const state = {
   apartments: [],
   monthOptions: [],
   selectedApartment: "2 Nolu Daire",
-  selectedMonth: "Nisan 2026",
+  selectedMonth: `${MONTH_NAMES[new Date().getMonth()]} ${new Date().getFullYear()}`,
   selectedReservationId: null,
   currentUser: null,
   editingUserOriginalUsername: null,
@@ -583,7 +583,13 @@ function buildImportedState(rawData) {
   }));
 
   state.apartments = apartments.map((item) => item.name);
-  state.monthOptions = apartments[0]?.months.map((month) => month.monthLabel) || [];
+  const importedMonthLabels = Array.from(new Set(apartments.flatMap((apartment) => apartment.months.map((month) => month.monthLabel))));
+  const currentYear = new Date().getFullYear();
+  const years = new Set(importedMonthLabels.map((label) => parseMonthLabel(label).year));
+  for (let year = currentYear; year <= currentYear + 5; year += 1) years.add(year);
+  state.monthOptions = Array.from(years)
+    .sort((left, right) => left - right)
+    .flatMap((year) => MONTH_NAMES.map((monthName) => `${monthName} ${year}`));
   state.monthsByApartment = {};
   state.busyByApartment = {};
 
@@ -617,6 +623,27 @@ function buildImportedState(rawData) {
 
       state.monthsByApartment[apartment.name][month.monthLabel] = {
         monthLabel: month.monthLabel,
+        weekdays: WEEKDAYS,
+        cells,
+      };
+    });
+
+    state.monthOptions.forEach((monthLabel) => {
+      if (state.monthsByApartment[apartment.name][monthLabel]) return;
+      const { monthIndex, year } = parseMonthLabel(monthLabel);
+      const gridStart = startOfGrid(year, monthIndex);
+      const cells = Array.from({ length: 42 }, (_, index) => {
+        const date = addDays(gridStart, index);
+        return {
+          isoDate: toIso(date),
+          dayLabel: String(date.getDate()),
+          note: "",
+          empty: true,
+          currentMonth: date.getMonth() === monthIndex,
+        };
+      });
+      state.monthsByApartment[apartment.name][monthLabel] = {
+        monthLabel,
         weekdays: WEEKDAYS,
         cells,
       };
