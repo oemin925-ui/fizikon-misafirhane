@@ -587,7 +587,9 @@ function buildImportedState(rawData) {
   const importedMonthLabels = Array.from(new Set(apartments.flatMap((apartment) => apartment.months.map((month) => month.monthLabel))));
   const currentYear = new Date().getFullYear();
   const years = new Set(importedMonthLabels.map((label) => parseMonthLabel(label).year));
-  for (let year = currentYear; year <= currentYear + 20; year += 1) years.add(year);
+  const firstYear = Math.min(currentYear, 2026);
+  const lastYear = Math.max(currentYear, 2027) + 20;
+  for (let year = firstYear; year <= lastYear; year += 1) years.add(year);
   state.monthOptions = Array.from(years)
     .sort((left, right) => left - right)
     .flatMap((year) => MONTH_NAMES.map((monthName) => `${monthName} ${year}`));
