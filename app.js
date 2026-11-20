@@ -70,6 +70,7 @@ const elements = {
   apartmentInput: document.getElementById("apartment"),
   apartmentFilter: document.getElementById("apartmentFilter"),
   monthFilter: document.getElementById("monthFilter"),
+  yearFilter: document.getElementById("yearFilter"),
   calendar: document.getElementById("calendar"),
   calendarTitle: document.getElementById("calendarTitle"),
   importStatus: document.getElementById("importStatus"),
@@ -683,19 +684,23 @@ function populateSelectors() {
   elements.apartmentInput.innerHTML = "";
   elements.apartmentFilter.innerHTML = "";
   elements.monthFilter.innerHTML = "";
+  elements.yearFilter.innerHTML = "";
 
   state.apartments.forEach((apartment) => {
     elements.apartmentInput.add(new Option(apartment, apartment));
     elements.apartmentFilter.add(new Option(apartment, apartment));
   });
 
-  state.monthOptions.forEach((monthLabel) => {
-    elements.monthFilter.add(new Option(monthLabel, monthLabel));
-  });
+  Array.from(new Set(state.monthOptions.map((label) => parseMonthLabel(label).year)))
+    .sort((left, right) => left - right)
+    .forEach((year) => elements.yearFilter.add(new Option(String(year), String(year))));
+  MONTH_NAMES.forEach((monthName) => elements.monthFilter.add(new Option(monthName, monthName)));
 
+  const selected = parseMonthLabel(state.selectedMonth);
   elements.apartmentInput.value = state.selectedApartment;
   elements.apartmentFilter.value = state.selectedApartment;
-  elements.monthFilter.value = state.selectedMonth;
+  elements.yearFilter.value = String(selected.year);
+  elements.monthFilter.value = MONTH_NAMES[selected.monthIndex];
 }
 
 function reservationTouchesDate(reservation, isoDate) {
@@ -948,7 +953,9 @@ function syncSelections(apartment, monthLabel = state.selectedMonth) {
   state.selectedMonth = monthLabel;
   elements.apartmentInput.value = apartment;
   elements.apartmentFilter.value = apartment;
-  elements.monthFilter.value = monthLabel;
+  const selected = parseMonthLabel(monthLabel);
+  elements.yearFilter.value = String(selected.year);
+  elements.monthFilter.value = MONTH_NAMES[selected.monthIndex];
   refreshView();
 }
 
@@ -1461,7 +1468,14 @@ function bindEvents() {
   });
 
   elements.monthFilter.addEventListener("change", (event) => {
-    syncSelections(state.selectedApartment, event.target.value);
+    const year = elements.yearFilter.value;
+    syncSelections(state.selectedApartment, `${event.target.value} ${year}`);
+    resetForm();
+  });
+
+  elements.yearFilter.addEventListener("change", (event) => {
+    const { monthIndex } = parseMonthLabel(state.selectedMonth);
+    syncSelections(state.selectedApartment, `${MONTH_NAMES[monthIndex]} ${event.target.value}`);
     resetForm();
   });
 
