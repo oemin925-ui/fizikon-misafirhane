@@ -680,7 +680,23 @@ function updateGuestNameSuggestions() {
     .join("");
 }
 
+function ensureYearFilter() {
+  if (elements.yearFilter) return;
+
+  const filters = document.querySelector(".filters");
+  if (!filters) return;
+
+  const label = document.createElement("label");
+  label.append(document.createTextNode("Yıl"));
+  const select = document.createElement("select");
+  select.id = "yearFilter";
+  label.append(select);
+  filters.prepend(label);
+  elements.yearFilter = select;
+}
+
 function populateSelectors() {
+  ensureYearFilter();
   elements.apartmentInput.innerHTML = "";
   elements.apartmentFilter.innerHTML = "";
   elements.monthFilter.innerHTML = "";
